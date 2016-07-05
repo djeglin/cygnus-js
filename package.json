@@ -1,0 +1,36 @@
+{
+  "name": "cygnus-js",
+  "version": "0.1.0",
+  "description": "Fast, graceful, JS-based page loading without going full SPA",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/djeglin/cygnus-js.git"
+  },
+  "keywords": [
+    "page",
+    "state",
+    "cygnus",
+    "worker",
+    "fetch",
+    "cache",
+    "load",
+    "pushstate",
+    "ajax"
+  ],
+  "author": "djeglin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/djeglin/cygnus-js/issues"
+  },
+  "homepage": "https://github.com/djeglin/cygnus-js#readme",
+  "dependencies": {
+
+  },
+  "devDependencies": {
+    
+  }
+}
