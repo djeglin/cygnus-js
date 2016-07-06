@@ -1,7 +1,7 @@
 /* global XMLHttpRequest */
 const fetchedPages = []
 
-window.onmessage = (msg) => {
+self.onmessage = (msg) => {
   const data = JSON.parse(msg.data)
 
   if (data.task === 'fetch') {
@@ -45,5 +45,5 @@ function getPage (url) {
 }
 
 function sendToBrowser (data) {
-  window.postMessage(JSON.stringify(data))
+  self.postMessage(JSON.stringify(data))
 }
