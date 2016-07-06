@@ -123,16 +123,15 @@ module.exports =
     document.title = pageTitle
 
     # Set animation attributes on body tag
-    outro = page.querySelector('body').getAttribute('data-outro')
-    intro = page.querySelector('body').getAttribute('data-intro')
-    if outro?
-      document.body.setAttribute "data-outro", outro
-    else
-      document.body.removeAttribute "data-outro"
-    if intro?
-      document.body.setAttribute "data-intro", intro
-    else
-      document.body.removeAttribute "data-intro"
+    pageBody = page.querySelector 'body'
+    docBody = document.body
+    outro = pageBody.getAttribute 'data-outro'
+    intro = pageBody.getAttribute 'data-intro'
+    bodyClass = pageBody.getAttribute 'class'
+
+    if bodyClass? then docBody.setAttribute 'class', bodyClass else docBody.removeAttribute 'class'
+    if outro? then docBody.setAttribute "data-outro", outro else docBody.removeAttribute "data-outro"
+    if intro? then docBody.setAttribute "data-intro", intro else docBody.removeAttribute "data-intro"
 
     # Remove any per-page css file if needed, and add the new one from the page to be loaded if present
     documentStylesheet = document.querySelector "link[data-rel='page-css']"
@@ -141,7 +140,6 @@ module.exports =
     document.querySelector('head').appendChild(pageStylesheet.cloneNode(true)) if !!pageStylesheet
 
     # Replace only the content within our page wrapper, as the stuff outside that will remain unchanged
-    # TODO: Think about whether we need to change body classes etc
     wrapper = document.querySelector '.wrap'
     pageContent = page.querySelector('.wrap').cloneNode(true).innerHTML
     wrapper.innerHTML = pageContent
