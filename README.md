@@ -1,5 +1,6 @@
-# Cygnus-js
-Fast, graceful JS-based page loading without going full SPA
+# Cygnus
+
+Fast, graceful JS-based page loading without going full SPA.
 
 *It takes a lot of work under the surface to look this graceful*
 
@@ -12,12 +13,15 @@ SPAs are notoriously bad for SEO purposes, at least without expending a good dea
 
 Whilst there is definitely a place for SPAs on the web today, that place shouldn't be for static websites. It seems incredibly pointless to bring a full javascript routing and rendering engine to the party when simple html pages will do, so Cygnus-js provides the best of both worlds – Smoothly-displayed, performant content that is also crawlable and directly-linkable. 
 
-## Installing
-Not now... But soon! 
+### Installation
 
-## How does Cygnus-js work?
+- Install through npm with `npm i cygnus -S` (recommended)
+- Or download the script directly from `build` and include as you wish
 
-### The worker
+### Usage
 
-### Transitions
+...
 
+### License & Contributing
+
+Licensed under [MIT](LICENSE)
