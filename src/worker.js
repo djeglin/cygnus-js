@@ -1,4 +1,4 @@
-/* global XMLHttpRequest */
+/* global self, XMLHttpRequest */
 const fetchedPages = []
 
 self.onmessage = (msg) => {

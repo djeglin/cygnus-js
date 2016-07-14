@@ -1,7 +1,6 @@
-const _this2 = this
-const _arguments = arguments
-
 /* global cygnus, Blob, Worker, XMLHttpRequest */
+
+const _arguments = arguments
 
 module.exports = {
   supportsHistory: !!window.history,
@@ -10,21 +9,20 @@ module.exports = {
   ready: false,
   pages: {},
   init: function () {
-    var _this2 = this
-    if (!_this2.ready) {
-      window.cygnus = _this2
-      window.onpopstate = _this2.handlePopState
-      _this2.ready = true
+    if (!this.ready) {
+      window.cygnus = this
+      window.onpopstate = this.handlePopState
+      this.ready = true
     }
 
     // Exit if history api, workers and promises aren't all supported
-    if (!_this2.supportsHistory || !_this2.supportsWorkers || !_this2.supportsPromises) {
+    if (!this.supportsHistory || !this.supportsWorkers || !this.supportsPromises) {
       console.info('[Cygnus]: cygnus is not supported in this browser.')
       return false
     }
 
     // Start up the worker if it hasn't already been started
-    if (typeof _this2.cygnusWorker === 'undefined') {
+    if (typeof this.cygnusWorker === 'undefined') {
       const workerSrc = document.querySelector('[data-cygnus-worker]').getAttribute('data-src')
       cygnus.ajaxPromise(workerSrc).then(response => {
         const blob = new Blob([response])
@@ -34,7 +32,7 @@ module.exports = {
         console.error('[Cygnus]: Worker initialisation failed!', error)
       })
     } else {
-      _this2.completeInit()
+      this.completeInit()
     }
   },
   completeInit: () => {
@@ -118,7 +116,7 @@ module.exports = {
       cygnus.completeLoadPage(href, click, page)
     }
   },
-  completeLoadPage: (href, click, page) => {
+  completeLoadPage: function (href, click, page) {
     // If we get this far, the page is in the store and we should update the
     // history object
     if (click) window.history.pushState({ url: href }, '', href)
@@ -175,7 +173,7 @@ module.exports = {
         console.error('[Cygnus]: Intro animation promise errorred. Broken :(')
       })
     } else {
-      _this2.postLoadPage()
+      this.postLoadPage()
     }
   },
   postLoadPage: () => {
