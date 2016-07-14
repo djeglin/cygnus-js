@@ -9,12 +9,17 @@ module.exports = {
   supportsPromises: !!Promise,
   ready: false,
   pages: {},
-  init: function() {
+  init: function(opts) {
+
+    const defaults = {
+      contentWrapper: '.wrap'
+    }
 
     var _this2 = this;
     if (!_this2.ready) {
       window.cygnus = _this2;
       window.onpopstate = _this2.handlePopState;
+      cygnus.options = Object.assign({}, defaults, opts);
       _this2.ready = true;
     }
 
@@ -152,20 +157,20 @@ module.exports = {
 
     // Remove any per-page css file if needed, and add the new one from the page
     // to be loaded if present
-    const documentStylesheet = document.querySelector("link[data-rel='page-css']");
-    if (documentStylesheet) {
-      documentStylesheet.parentNode.removeChild(documentStylesheet);
+    const documentStylesheets = document.querySelectorAll("link[data-rel='page-css']");
+    for (var i = 0, max = documentStylesheets.length; i < max; i++) {
+      documentStylesheets[i].parentNode.removeChild(documentStylesheets[i]);
     }
 
-    const pageStylesheet = page.querySelector("link[data-rel='page-css']");
-    if (pageStylesheet) {
-      document.querySelector('head').appendChild(pageStylesheet.cloneNode(true));
+    const pageStylesheets = page.querySelectorAll("link[data-rel='page-css']");
+    for (var j = 0, max = pageStylesheets.length; j < max; j++) {
+      document.querySelector('head').appendChild(pageStylesheets[i].cloneNode(true));
     }
 
     // Replace only the content within our page wrapper, as the stuff outside
     // that will remain unchanged
-    const wrapper = document.querySelector('.wrap');
-    const pageContent = page.querySelector('.wrap').cloneNode(true).innerHTML;
+    const wrapper = document.querySelector(cygnus.options.contentWrapper);
+    const pageContent = page.querySelector(cygnus.options.contentWrapper).cloneNode(true).innerHTML;
     wrapper.innerHTML = pageContent;
 
     // Intro animation...
