@@ -1,22 +1,24 @@
-/* global XMLHttpRequest */
-const fetchedPages = [];
+'use strict';
 
-window.onmessage = msg => {
-  const data = JSON.parse(msg.data);
+/* global self, XMLHttpRequest */
+var fetchedPages = [];
+
+self.onmessage = function (msg) {
+  var data = JSON.parse(msg.data);
 
   if (data.task === 'fetch') {
-    console.info(`[Cygnus worker]: Fetching ${ data.link }`);
+    console.info('[Cygnus worker]: Fetching ' + data.link);
     if (fetchedPages.indexOf(data.link) < 0) {
-      getPage(data.link).then(response => {
+      getPage(data.link).then(function (response) {
         fetchedPages.push(data.link);
         sendToBrowser({ link: data.link, html: response });
-      }, error => {
+      }, function (error) {
         console.error('[Cygnus worker]: Failed!', error);
       });
     }
   }
   if (data.task === 'add') {
-    console.info(`[Cygnus worker]: Adding ${ data.link } to list without fetching.`);
+    console.info('[Cygnus worker]: Adding ' + data.link + ' to list without fetching.');
     if (fetchedPages.indexOf(data.link) < 0) {
       fetchedPages.push(data.link);
     }
@@ -24,11 +26,11 @@ window.onmessage = msg => {
 };
 
 function getPage(url) {
-  return new Promise((resolve, reject) => {
-    const req = new XMLHttpRequest();
+  return new Promise(function (resolve, reject) {
+    var req = new XMLHttpRequest();
     req.open('GET', url);
 
-    req.onload = () => {
+    req.onload = function () {
       if (req.status === 200) {
         resolve(req.response);
       } else {
@@ -36,7 +38,7 @@ function getPage(url) {
       }
     };
 
-    req.onerror = () => {
+    req.onerror = function () {
       reject(new Error('Network Error'));
     };
 
@@ -45,5 +47,5 @@ function getPage(url) {
 }
 
 function sendToBrowser(data) {
-  window.postMessage(JSON.stringify(data));
+  self.postMessage(JSON.stringify(data));
 }
