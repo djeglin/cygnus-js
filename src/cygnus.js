@@ -1,5 +1,5 @@
-var _this2 = this,
-    _arguments = arguments;
+const _this2 = this
+const _arguments = arguments
 
 /* global cygnus, Blob, Worker, XMLHttpRequest */
 
@@ -9,186 +9,184 @@ module.exports = {
   supportsPromises: !!Promise,
   ready: false,
   pages: {},
-  init: function() {
-
-    var _this2 = this;
+  init: function () {
+    var _this2 = this
     if (!_this2.ready) {
-      window.cygnus = _this2;
-      window.onpopstate = _this2.handlePopState;
-      _this2.ready = true;
+      window.cygnus = _this2
+      window.onpopstate = _this2.handlePopState
+      _this2.ready = true
     }
 
     // Exit if history api, workers and promises aren't all supported
     if (!_this2.supportsHistory || !_this2.supportsWorkers || !_this2.supportsPromises) {
-      console.info('[Cygnus]: cygnus is not supported in this browser.');
-      return false;
+      console.info('[Cygnus]: cygnus is not supported in this browser.')
+      return false
     }
 
     // Start up the worker if it hasn't already been started
     if (typeof _this2.cygnusWorker === 'undefined') {
-      const workerSrc = document.querySelector('[data-cygnus-worker]').getAttribute('data-src');
+      const workerSrc = document.querySelector('[data-cygnus-worker]').getAttribute('data-src')
       cygnus.ajaxPromise(workerSrc).then(response => {
-        const blob = new Blob([response]);
-        cygnus.cygnusWorker = new Worker(window.URL.createObjectURL(blob));
-        cygnus.completeInit();
+        const blob = new Blob([response])
+        cygnus.cygnusWorker = new Worker(window.URL.createObjectURL(blob))
+        cygnus.completeInit()
       }, error => {
-        console.error('[Cygnus]: Worker initialisation failed!', error);
-      });
+        console.error('[Cygnus]: Worker initialisation failed!', error)
+      })
     } else {
-      _this2.completeInit();
+      _this2.completeInit()
     }
   },
   completeInit: () => {
     // Respond to the worker
     cygnus.cygnusWorker.onmessage = e => {
-      cygnus.receivePageData(JSON.parse(e.data));
-    };
+      cygnus.receivePageData(JSON.parse(e.data))
+    }
 
     // Add current page without re-fectching it
-    if (!cygnus.pages[window.location.href]) cygnus.getCurrentPage();
+    if (!cygnus.pages[window.location.href]) cygnus.getCurrentPage()
 
     // Get list of links and send them off to the worker
-    let links = cygnus.getLinks();
-    links.map((current, index, arr) => cygnus.dispatchLink(index, arr[index]) );
+    let links = cygnus.getLinks()
+    links.map((current, index, arr) => cygnus.dispatchLink(index, arr[index]))
 
     // Handle clicks on links
-    cygnus.catchLinks(links);
+    cygnus.catchLinks(links)
   },
   getCurrentPage: () => {
-    console.info("[Cygnus]: Current page isn't in store. Adding from html already loaded in browser.");
+    console.info("[Cygnus]: Current page isn't in store. Adding from html already loaded in browser.")
     // Add the current page's html to the store
-    cygnus.pages[window.location.href] = cygnus.parseHTML(document.documentElement.outerHTML);
-    const messageData = { task: 'add', link: window.location.href };
+    cygnus.pages[window.location.href] = cygnus.parseHTML(document.documentElement.outerHTML)
+    const messageData = { task: 'add', link: window.location.href }
     // Notify the worker that this page doesn't need to be fetched
-    cygnus.cygnusWorker.postMessage(JSON.stringify(messageData));
+    cygnus.cygnusWorker.postMessage(JSON.stringify(messageData))
   },
   getLinks: () => {
-    let documentLinks = document.querySelectorAll('a[href]');
-    documentLinks = Array.prototype.slice.call(documentLinks, 0);
-    return documentLinks.filter(cygnus.filterLinks);
+    let documentLinks = document.querySelectorAll('a[href]')
+    documentLinks = Array.prototype.slice.call(documentLinks, 0)
+    return documentLinks.filter(cygnus.filterLinks)
   },
   filterLinks: link => {
-    return link.hostname === window.location.hostname;
+    return link.hostname === window.location.hostname
   },
   dispatchLink: (key, link) => {
     // We don't dispatch the link to the worker if it has already been fetched
     if (!cygnus.pages[link]) {
-      const messageData = { task: 'fetch', link: link.href };
-      cygnus.cygnusWorker.postMessage(JSON.stringify(messageData));
+      const messageData = { task: 'fetch', link: link.href }
+      cygnus.cygnusWorker.postMessage(JSON.stringify(messageData))
     }
   },
   catchLinks: links => {
-    const _this = cygnus;
     links.forEach((link, i) => {
       // We clone these links in case they already have eventlisteners applied.
       // This removes them
-      const clone = link.cloneNode(true);
-      link.parentNode.replaceChild(clone, link);
+      const clone = link.cloneNode(true)
+      link.parentNode.replaceChild(clone, link)
       clone.addEventListener('click', function (e) {
-        e.preventDefault();
-        if (this.href !== window.location.href) cygnus.startLoadPage(this.href, true);
-      });
-    });
+        e.preventDefault()
+        if (this.href !== window.location.href) cygnus.startLoadPage(this.href, true)
+      })
+    })
   },
   handlePopState: event => {
     if (cygnus.ready) {
-      cygnus.startLoadPage(document.location);
-      return true;
+      cygnus.startLoadPage(document.location)
+      return true
     }
   },
   startLoadPage: (href, click = false) => {
     // Get the page from the store. We use "cygnus" rather than "this" here as
     // this method can be called from outside the local scope
-    const page = cygnus.pages[href];
+    const page = cygnus.pages[href]
 
     // If the requested page isn't in the store for some reason, navigate as
     // normal
     if (!page) {
-      window.location.assign(href);
-      return false;
+      window.location.assign(href)
+      return false
     }
 
     // Outro animation...
-    const outro = page.querySelector('body').getAttribute('data-outro');
+    const outro = page.querySelector('body').getAttribute('data-outro')
     if (outro && !!cygnus.isFunction(outro, window)) {
       cygnus.getFunction(outro, window).then(response => {
-        cygnus.completeLoadPage(href, click, page);
+        cygnus.completeLoadPage(href, click, page)
       }, () => {
-        console.error('[Cygnus]: Outro animation promise errorred. Broken :(');
-      });
+        console.error('[Cygnus]: Outro animation promise errorred. Broken :(')
+      })
     } else {
-      cygnus.completeLoadPage(href, click, page);
+      cygnus.completeLoadPage(href, click, page)
     }
   },
   completeLoadPage: (href, click, page) => {
     // If we get this far, the page is in the store and we should update the
     // history object
-    if (click) window.history.pushState({ url: href }, '', href);
+    if (click) window.history.pushState({ url: href }, '', href)
 
     // Set the page title from the stored page
-    document.title = page.querySelector('title').innerText;
+    document.title = page.querySelector('title').innerText
 
     // Set animation attributes on body tag
-    let pageBody = page.querySelector('body');
-    let docBody = document.body;
-    let outro = pageBody.getAttribute('data-outro');
-    let intro = pageBody.getAttribute('data-intro');
-    let bodyClass = pageBody.getAttribute('class');
+    let pageBody = page.querySelector('body')
+    let docBody = document.body
+    let outro = pageBody.getAttribute('data-outro')
+    let intro = pageBody.getAttribute('data-intro')
+    let bodyClass = pageBody.getAttribute('class')
     if (bodyClass != null) {
-      docBody.setAttribute('class', bodyClass);
+      docBody.setAttribute('class', bodyClass)
     } else {
-      docBody.removeAttribute('class');
+      docBody.removeAttribute('class')
     }
     if (outro != null) {
-      docBody.setAttribute("data-outro", outro);
+      docBody.setAttribute('data-outro', outro)
     } else {
-      docBody.removeAttribute("data-outro");
+      docBody.removeAttribute('data-outro')
     }
     if (intro != null) {
-      docBody.setAttribute("data-intro", intro);
+      docBody.setAttribute('data-intro', intro)
     } else {
-      docBody.removeAttribute("data-intro");
+      docBody.removeAttribute('data-intro')
     }
 
     // Remove any per-page css file if needed, and add the new one from the page
     // to be loaded if present
-    const documentStylesheet = document.querySelector("link[data-rel='page-css']");
+    const documentStylesheet = document.querySelector("link[data-rel='page-css']")
     if (documentStylesheet) {
-      documentStylesheet.parentNode.removeChild(documentStylesheet);
+      documentStylesheet.parentNode.removeChild(documentStylesheet)
     }
 
-    const pageStylesheet = page.querySelector("link[data-rel='page-css']");
+    const pageStylesheet = page.querySelector("link[data-rel='page-css']")
     if (pageStylesheet) {
-      document.querySelector('head').appendChild(pageStylesheet.cloneNode(true));
+      document.querySelector('head').appendChild(pageStylesheet.cloneNode(true))
     }
 
     // Replace only the content within our page wrapper, as the stuff outside
     // that will remain unchanged
-    const wrapper = document.querySelector('.wrap');
-    const pageContent = page.querySelector('.wrap').cloneNode(true).innerHTML;
-    wrapper.innerHTML = pageContent;
+    const wrapper = document.querySelector('.wrap')
+    const pageContent = page.querySelector('.wrap').cloneNode(true).innerHTML
+    wrapper.innerHTML = pageContent
 
     // Intro animation...
-    intro = page.querySelector('body').getAttribute('data-intro');
+    intro = page.querySelector('body').getAttribute('data-intro')
     if (intro && !!cygnus.isFunction(intro, window)) {
       cygnus.getFunction(intro, window).then(response => {
-        cygnus.postLoadPage();
+        cygnus.postLoadPage()
       }, () => {
-        console.error('[Cygnus]: Intro animation promise errorred. Broken :(');
-      });
+        console.error('[Cygnus]: Intro animation promise errorred. Broken :(')
+      })
     } else {
-      _this2.postLoadPage();
+      _this2.postLoadPage()
     }
   },
   postLoadPage: () => {
     // Re-run the init method. This time it won't start the worker (it is
     // already running). Basically it will just check for new links and dispatch
     // them to the worker if needed
-    cygnus.init();
+    cygnus.init()
   },
   receivePageData: data => {
     // Add received page to the store
-    cygnus.pages[data.link] = cygnus.parseHTML(data.html);
+    cygnus.pages[data.link] = cygnus.parseHTML(data.html)
   },
 
   //
@@ -201,48 +199,48 @@ module.exports = {
 
   ajaxPromise: url => {
     return new Promise((resolve, reject) => {
-      const req = new XMLHttpRequest();
-      req.open('GET', url);
+      const req = new XMLHttpRequest()
+      req.open('GET', url)
 
       req.onload = () => {
         if (req.status === 200) {
-          resolve(req.response);
+          resolve(req.response)
         } else {
-          reject(new Error(req.statusText));
+          reject(new Error(req.statusText))
         }
-      };
+      }
 
       req.onerror = () => {
-        reject(new Error('Network Error'));
-      };
+        reject(new Error('Network Error'))
+      }
 
-      req.send();
-    });
+      req.send()
+    })
   },
   parseHTML: string => {
-    const tmp = document.implementation.createHTMLDocument('temp');
-    tmp.documentElement.innerHTML = string;
-    return tmp.documentElement;
+    const tmp = document.implementation.createHTMLDocument('temp')
+    tmp.documentElement.innerHTML = string
+    return tmp.documentElement
   },
   isFunction: (functionName, context) => {
-    let namespaces = functionName.split('.');
-    const func = namespaces.pop();
+    let namespaces = functionName.split('.')
+    const func = namespaces.pop()
     for (let k in namespaces) {
-      context = context[namespaces[k]];
+      context = context[namespaces[k]]
     }
-    return typeof context[func] === 'function';
+    return typeof context[func] === 'function'
   },
   getFunction: (functionName, context) => {
-    const args = [].slice.call(_arguments).splice(2);
-    const namespaces = functionName.split('.');
-    const func = namespaces.pop();
+    const args = [].slice.call(_arguments).splice(2)
+    const namespaces = functionName.split('.')
+    const func = namespaces.pop()
     for (const k in namespaces) {
-      context = context[namespaces[k]];
+      context = context[namespaces[k]]
     }
     if (context[func]) {
-      return context[func].apply(context, args);
+      return context[func].apply(context, args)
     } else {
-      return false;
+      return false
     }
   }
-};
+}
