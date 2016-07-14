@@ -59,7 +59,7 @@ That's it! Once included and initialised in your project, Cygnus will start to f
 
 If you want to enable transitions for your pages, you will need to do a little more work. 
 
-1. Create some animation functions
+##### Create some animation functions
 These functions must each return a promise that resolves once the animation is complete. See example below: 
 
 ```
@@ -108,6 +108,8 @@ module.exports = {
 ```
 
 You will see that the animations here are using [Anime.js](http://anime-js.com), but you could equally use GSAP, Velocity or similar should you want to. The important thing is that you structure the animation functions to return a promise. This is how Cygnus knows that each stage of the outro and into animations are complete and to move on to the next thing. 
+
+##### Reference the animations you want to use on each page
 
 Once you have these functions, you will need to reference them on the `body` tag of each page (TODO: Add a default animation selector, perhaps? Or the ability to set one in opts?) like so: 
 
