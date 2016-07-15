@@ -36,20 +36,20 @@ The reason that Cygnus uses a worker to do the heavy lifting is to take the actu
 
 At the most basic level, you simply need to include the following in your js...
 
-```
+```javascript
 const cygnus = require('cygnus');
 cygnus.init();
 ```
 
 ...and the following to your html
 
-```
+```html
 <script data-src="/path/to/worker.js"></script>
 ```
 
 Cygnus, by default, will look for a container in each of your pages with a class of `wrap` and use that to replace the content within. You can override this selector by passing in an options object to the `init()` method like so:
 
-```
+```javascript
 cygnus.init({contentWrapper: '.your-selector'})
 ```
 
@@ -62,7 +62,7 @@ If you want to enable transitions for your pages, you will need to do a little m
 ##### Create some animation functions
 These functions must each return a promise that resolves once the animation is complete. See example below: 
 
-```
+```javascript
 module.exports = {
   intros: {
     "default": function() {
@@ -113,7 +113,7 @@ You will see that the animations here are using [Anime.js](http://anime-js.com),
 
 Once you have these functions, you will need to reference them on the `body` tag of each page (TODO: Add a default animation selector, perhaps? Or the ability to set one in opts?) like so: 
 
-```
+```html
 <body data-intro="anims.intros.default" data-outro="anims.outros.default">
 ```
 
@@ -122,7 +122,7 @@ This allows Cygnus to find the animations you are using for each page.
 #### Custom CSS per page
 If you want to include different css files for individual pages, then simply add a `data-rel="page-css"` attribute to the html when you insert them, like this:
 
-```
+```html
 <link rel="stylesheet" data-rel="page-css" href="page.css">
 ```
 
