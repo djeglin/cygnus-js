@@ -1,36 +1,35 @@
-var _this2 = this,
-    _arguments = arguments;
+var _arguments = arguments;
 
 /* global cygnus, Blob, Worker, XMLHttpRequest */
 
-module.exports = {
+var cygnus = module.exports = {
   supportsHistory: !!window.history,
   supportsWorkers: !!window.Worker,
   supportsPromises: !!Promise,
   ready: false,
   pages: {},
-  init: function(opts) {
+  init: (opts) => {
 
     const defaults = {
-      contentWrapper: '.wrap'
+      contentWrapper: '.wrap',
+      makeGlobal: false
     }
 
-    var _this2 = this;
-    if (!_this2.ready) {
-      window.cygnus = _this2;
-      window.onpopstate = _this2.handlePopState;
+    if (!cygnus.ready) {
+      window.onpopstate = cygnus.handlePopState;
       cygnus.options = Object.assign({}, defaults, opts);
-      _this2.ready = true;
+      if (cygnus.options.makeGlobal) window.cygnus = cygnus;
+      cygnus.ready = true;
     }
 
     // Exit if history api, workers and promises aren't all supported
-    if (!_this2.supportsHistory || !_this2.supportsWorkers || !_this2.supportsPromises) {
+    if (!cygnus.supportsHistory || !cygnus.supportsWorkers || !cygnus.supportsPromises) {
       console.info('[Cygnus]: cygnus is not supported in this browser.');
       return false;
     }
 
     // Start up the worker if it hasn't already been started
-    if (typeof _this2.cygnusWorker === 'undefined') {
+    if (typeof cygnus.cygnusWorker === 'undefined') {
       const workerSrc = document.querySelector('[data-cygnus-worker]').getAttribute('data-src');
       cygnus.ajaxPromise(workerSrc).then(response => {
         const blob = new Blob([response]);
@@ -40,7 +39,7 @@ module.exports = {
         console.error('[Cygnus]: Worker initialisation failed!', error);
       });
     } else {
-      _this2.completeInit();
+      cygnus.completeInit();
     }
   },
   completeInit: () => {
@@ -83,7 +82,6 @@ module.exports = {
     }
   },
   catchLinks: links => {
-    const _this = cygnus;
     links.forEach((link, i) => {
       // We clone these links in case they already have eventlisteners applied.
       // This removes them
@@ -182,7 +180,7 @@ module.exports = {
         console.error('[Cygnus]: Intro animation promise errorred. Broken :(');
       });
     } else {
-      _this2.postLoadPage();
+      cygnus.postLoadPage();
     }
   },
   postLoadPage: () => {
