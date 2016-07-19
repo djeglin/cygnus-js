@@ -41,19 +41,13 @@ const cygnus = require('cygnus');
 cygnus.init();
 ```
 
-...and the following to your html
-
-```html
-<script data-src="/path/to/worker.js"></script>
-```
+That's it! Once included and initialised in your project, Cygnus will start to fetch your pages in the background and serve them up via javascript. 
 
 Cygnus, by default, will look for a container in each of your pages with a class of `wrap` and use that to replace the content within. You can override this selector by passing in an options object to the `init()` method like so:
 
 ```javascript
 cygnus.init({contentWrapper: '.your-selector'})
 ```
-
-That's it! Once included and initialised in your project, Cygnus will start to fetch your pages in the background and serve them up via javascript. 
 
 #### Transitions
 
