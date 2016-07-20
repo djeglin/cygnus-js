@@ -118,9 +118,6 @@ var cygnus = module.exports = {
     }
   },
   completeLoadPage: (href, click, page) => {
-    // If we get this far, the page is in the store and we should update the
-    // history object
-    if (click) window.history.pushState({ url: href }, '', href);
 
     // Set the page title from the stored page
     document.title = page.querySelector('title').innerText;
@@ -164,6 +161,9 @@ var cygnus = module.exports = {
     const wrapper = document.querySelector(cygnus.options.contentWrapper);
     const pageContent = page.querySelector(cygnus.options.contentWrapper).cloneNode(true).innerHTML;
     wrapper.innerHTML = pageContent;
+
+    // Update the history object
+    if (click) window.history.pushState({ url: href }, '', href);
 
     // Intro animation...
     intro = page.querySelector('body').getAttribute('data-intro');
