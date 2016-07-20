@@ -183,7 +183,7 @@ var cygnus = module.exports = {
     // them to the worker if needed
     cygnus.init();
 
-    const event = new Event('cygnusPageLoaded');
+    const event = new CustomEvent('cygnusPageLoaded');
     window.dispatchEvent(event);
   },
   receivePageData: data => {
