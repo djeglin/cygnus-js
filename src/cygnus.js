@@ -182,6 +182,9 @@ var cygnus = module.exports = {
     // already running). Basically it will just check for new links and dispatch
     // them to the worker if needed
     cygnus.init();
+
+    const event = new Event('cygnusPageLoaded');
+    window.dispatchEvent(event);
   },
   receivePageData: data => {
     // Add received page to the store
