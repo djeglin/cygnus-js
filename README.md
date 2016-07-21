@@ -122,6 +122,20 @@ If you want to include different css files for individual pages, then simply add
 
 Cygnus will load all css files referenced in this way when it changes pages, even though it doesn't replace the entire html of the page.
 
+#### Javascript running on page load
+
+Because of the way Cygnus interrupts the standard page load model, javscript that would normally fire when a page loads does not behave in the same way. In an effort to get around this, Cygnus fires a custom event every time it loads a page – `cygnusPageLoaded`, which you can attach any code you want to run on each page load like so: 
+
+```javascript
+const initPage = () => {
+  doSomeStuff();
+}
+
+window.addEventListener("cygnusPageLoaded", () => {
+  initPage();
+});
+```
+
 
 ### License & Contributing
 
