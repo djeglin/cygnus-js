@@ -136,6 +136,8 @@ window.addEventListener("cygnusPageLoaded", () => {
 });
 ```
 
+### Changelog
+`0.2.0`: Added custom event to fire on every page load
 
 ### License & Contributing
 
