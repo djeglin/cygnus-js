@@ -7,6 +7,7 @@ var cygnus = module.exports = {
   supportsWorkers: !!window.Worker,
   supportsPromises: !!Promise,
   ready: false,
+  fetchingPages: [],
   pages: {},
   init: (opts) => {
 
@@ -69,8 +70,14 @@ var cygnus = module.exports = {
     return link.hostname === window.location.hostname;
   },
   dispatchLink: (key, link) => {
+    // We don't dispatch the link to the worker if it is already being fetched
+    if (cygnus.fetchingPages.indexOf(link.href) > -1) {
+      console.info("[Cygnus]: " + link.href + " is already being fetched. Ignoring.");
+      return;
+    }
     // We don't dispatch the link to the worker if it has already been fetched
     if (!cygnus.pages[link]) {
+      cygnus.fetchingPages.push(link.href);
       const messageData = { task: 'fetch', link: link.href };
       cygnus.cygnusWorker.postMessage(JSON.stringify(messageData));
     }
@@ -187,6 +194,11 @@ var cygnus = module.exports = {
     window.dispatchEvent(event);
   },
   receivePageData: data => {
+    // Remove page from fetchingPages array
+    var index = cygnus.fetchingPages.indexOf(data.link);
+    if (index > -1) {
+      cygnus.fetchingPages.splice(index, 1);
+    }
     // Add received page to the store
     cygnus.pages[data.link] = cygnus.parseHTML(data.html);
   },
