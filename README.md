@@ -137,6 +137,7 @@ window.addEventListener("cygnusPageLoaded", () => {
 ```
 
 ### Changelog
+`0.3.0`: Added a check to see whether a page is already fetching before dispatching links to worker
 `0.2.0`: Added custom event to fire on every page load
 
 ### License & Contributing
