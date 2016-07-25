@@ -172,6 +172,9 @@ var cygnus = module.exports = {
     // Update the history object
     if (click) window.history.pushState({ url: href }, '', href);
 
+    // Scroll to the top of new page if from a clicked link
+    if (click) window.scrollTo(0, 0);
+
     // Intro animation...
     intro = page.querySelector('body').getAttribute('data-intro');
     if (intro && !!cygnus.isFunction(intro, window)) {

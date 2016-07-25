@@ -145,6 +145,8 @@ window.addEventListener("cygnusPageLoaded", (e) => {
 ```
 
 ### Changelog
+`0.4.0`: Cygnus will now scroll to the top of the page during transition if the page change is triggered from a clicked link (rather than history action)
+
 `0.3.0`: Added a check to see whether a page is already fetching before dispatching links to worker
 
 `0.2.0`: Added custom event to fire on every page load
