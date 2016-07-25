@@ -131,10 +131,12 @@ const initPage = () => {
   doSomeStuff();
 }
 
-window.addEventListener("cygnusPageLoaded", () => {
+window.addEventListener("cygnusPageLoaded", (e) => {
   initPage();
 });
 ```
+
+This event also exposes a property on the event object of `page`, which carries a value of the `location.pathname` of the loaded page, allowing you to target certain functions to certain pages if needed. 
 
 ### Changelog
 `0.3.0`: Added a check to see whether a page is already fetching before dispatching links to worker
