@@ -136,7 +136,13 @@ window.addEventListener("cygnusPageLoaded", (e) => {
 });
 ```
 
-This event also exposes a property on the event object of `page`, which carries a value of the `location.pathname` of the loaded page, allowing you to target certain functions to certain pages if needed. 
+This event also exposes some information on the `detail` property of the event object. It carries a property called `page`, which has a value of the `location.pathname` of the loaded page, allowing you to target certain functions to certain pages if needed, like so: 
+
+```javascript
+window.addEventListener("cygnusPageLoaded", (e) => {
+  console.log(e.detail.page); // Logs out loaded path
+});
+```
 
 ### Changelog
 `0.3.0`: Added a check to see whether a page is already fetching before dispatching links to worker

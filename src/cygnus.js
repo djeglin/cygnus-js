@@ -190,7 +190,7 @@ var cygnus = module.exports = {
     // them to the worker if needed
     cygnus.init();
 
-    const event = new CustomEvent('cygnusPageLoaded', { "page" : location.pathname });
+    const event = new CustomEvent('cygnusPageLoaded', { "detail": { "page" : location.pathname } });
     window.dispatchEvent(event);
   },
   receivePageData: data => {
