@@ -1,3 +1,5 @@
+'use strict';
+
 var _arguments = arguments;
 
 /* global cygnus, Blob, Worker, XMLHttpRequest */
@@ -9,9 +11,9 @@ var cygnus = module.exports = {
   ready: false,
   fetchingPages: [],
   pages: {},
-  init: opts => {
+  init: function init(opts) {
 
-    const defaults = {
+    var defaults = {
       contentWrapper: '.wrap',
       makeGlobal: false
     };
@@ -37,9 +39,9 @@ var cygnus = module.exports = {
       cygnus.completeInit();
     }
   },
-  completeInit: () => {
+  completeInit: function completeInit() {
     // Respond to the worker
-    cygnus.cygnusWorker.onmessage = e => {
+    cygnus.cygnusWorker.onmessage = function (e) {
       cygnus.receivePageData(JSON.parse(e.data));
     };
 
@@ -47,29 +49,31 @@ var cygnus = module.exports = {
     if (!cygnus.pages[window.location.href]) cygnus.getCurrentPage();
 
     // Get list of links and send them off to the worker
-    let links = cygnus.getLinks();
-    links.map((current, index, arr) => cygnus.dispatchLink(index, arr[index]));
+    var links = cygnus.getLinks();
+    links.map(function (current, index, arr) {
+      return cygnus.dispatchLink(index, arr[index]);
+    });
 
     // Handle clicks on links
     cygnus.catchLinks(links);
   },
-  getCurrentPage: () => {
+  getCurrentPage: function getCurrentPage() {
     console.info("[Cygnus]: Current page isn't in store. Adding from html already loaded in browser.");
     // Add the current page's html to the store
     cygnus.pages[window.location.href] = cygnus.parseHTML(document.documentElement.outerHTML);
-    const messageData = { task: 'add', link: window.location.href };
+    var messageData = { task: 'add', link: window.location.href };
     // Notify the worker that this page doesn't need to be fetched
     cygnus.cygnusWorker.postMessage(JSON.stringify(messageData));
   },
-  getLinks: () => {
-    let documentLinks = document.querySelectorAll('a[href]');
+  getLinks: function getLinks() {
+    var documentLinks = document.querySelectorAll('a[href]');
     documentLinks = Array.prototype.slice.call(documentLinks, 0);
     return documentLinks.filter(cygnus.filterLinks);
   },
-  filterLinks: link => {
+  filterLinks: function filterLinks(link) {
     return link.hostname === window.location.hostname;
   },
-  dispatchLink: (key, link) => {
+  dispatchLink: function dispatchLink(key, link) {
     // We don't dispatch the link to the worker if it is already being fetched
     if (cygnus.fetchingPages.indexOf(link.href) > -1) {
       console.info("[Cygnus]: " + link.href + " is already being fetched. Ignoring.");
@@ -78,15 +82,15 @@ var cygnus = module.exports = {
     // We don't dispatch the link to the worker if it has already been fetched
     if (!cygnus.pages[link]) {
       cygnus.fetchingPages.push(link.href);
-      const messageData = { task: 'fetch', link: link.href };
+      var messageData = { task: 'fetch', link: link.href };
       cygnus.cygnusWorker.postMessage(JSON.stringify(messageData));
     }
   },
-  catchLinks: links => {
-    links.forEach((link, i) => {
+  catchLinks: function catchLinks(links) {
+    links.forEach(function (link, i) {
       // We clone these links in case they already have eventlisteners applied.
       // This removes them
-      const clone = link.cloneNode(true);
+      var clone = link.cloneNode(true);
       link.parentNode.replaceChild(clone, link);
       clone.addEventListener('click', function (e) {
         e.preventDefault();
@@ -94,16 +98,18 @@ var cygnus = module.exports = {
       });
     });
   },
-  handlePopState: event => {
+  handlePopState: function handlePopState(event) {
     if (cygnus.ready) {
       cygnus.startLoadPage(document.location);
       return true;
     }
   },
-  startLoadPage: (href, click = false) => {
+  startLoadPage: function startLoadPage(href) {
+    var click = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
     // Get the page from the store. We use "cygnus" rather than "this" here as
     // this method can be called from outside the local scope
-    const page = cygnus.pages[href];
+    var page = cygnus.pages[href];
 
     // If the requested page isn't in the store for some reason, navigate as
     // normal
@@ -113,28 +119,28 @@ var cygnus = module.exports = {
     }
 
     // Outro animation...
-    const outro = page.querySelector('body').getAttribute('data-outro');
+    var outro = page.querySelector('body').getAttribute('data-outro');
     if (outro && !!cygnus.isFunction(outro, window)) {
-      cygnus.getFunction(outro, window).then(response => {
+      cygnus.getFunction(outro, window).then(function (response) {
         cygnus.completeLoadPage(href, click, page);
-      }, () => {
+      }, function () {
         console.error('[Cygnus]: Outro animation promise errorred. Broken :(');
       });
     } else {
       cygnus.completeLoadPage(href, click, page);
     }
   },
-  completeLoadPage: (href, click, page) => {
+  completeLoadPage: function completeLoadPage(href, click, page) {
 
     // Set the page title from the stored page
     document.title = page.querySelector('title').innerText;
 
     // Set animation attributes on body tag
-    let pageBody = page.querySelector('body');
-    let docBody = document.body;
-    let outro = pageBody.getAttribute('data-outro');
-    let intro = pageBody.getAttribute('data-intro');
-    let bodyClass = pageBody.getAttribute('class');
+    var pageBody = page.querySelector('body');
+    var docBody = document.body;
+    var outro = pageBody.getAttribute('data-outro');
+    var intro = pageBody.getAttribute('data-intro');
+    var bodyClass = pageBody.getAttribute('class');
     if (bodyClass != null) {
       docBody.setAttribute('class', bodyClass);
     } else {
@@ -153,20 +159,20 @@ var cygnus = module.exports = {
 
     // Remove any per-page css file if needed, and add the new one from the page
     // to be loaded if present
-    const documentStylesheets = document.querySelectorAll("link[data-rel='page-css']");
+    var documentStylesheets = document.querySelectorAll("link[data-rel='page-css']");
     for (var i = 0, max = documentStylesheets.length; i < max; i++) {
       documentStylesheets[i].parentNode.removeChild(documentStylesheets[i]);
     }
 
-    const pageStylesheets = page.querySelectorAll("link[data-rel='page-css']");
+    var pageStylesheets = page.querySelectorAll("link[data-rel='page-css']");
     for (var j = 0, max = pageStylesheets.length; j < max; j++) {
       document.querySelector('head').appendChild(pageStylesheets[i].cloneNode(true));
     }
 
     // Replace only the content within our page wrapper, as the stuff outside
     // that will remain unchanged
-    const wrapper = document.querySelector(cygnus.options.contentWrapper);
-    const pageContent = page.querySelector(cygnus.options.contentWrapper).cloneNode(true).innerHTML;
+    var wrapper = document.querySelector(cygnus.options.contentWrapper);
+    var pageContent = page.querySelector(cygnus.options.contentWrapper).cloneNode(true).innerHTML;
     wrapper.innerHTML = pageContent;
 
     // Update the history object
@@ -178,25 +184,25 @@ var cygnus = module.exports = {
     // Intro animation...
     intro = page.querySelector('body').getAttribute('data-intro');
     if (intro && !!cygnus.isFunction(intro, window)) {
-      cygnus.getFunction(intro, window).then(response => {
+      cygnus.getFunction(intro, window).then(function (response) {
         cygnus.postLoadPage();
-      }, () => {
+      }, function () {
         console.error('[Cygnus]: Intro animation promise errorred. Broken :(');
       });
     } else {
       cygnus.postLoadPage();
     }
   },
-  postLoadPage: () => {
+  postLoadPage: function postLoadPage() {
     // Re-run the init method. This time it won't start the worker (it is
     // already running). Basically it will just check for new links and dispatch
     // them to the worker if needed
     cygnus.init();
 
-    const event = new CustomEvent('cygnusPageLoaded', { "detail": { "page": location.pathname } });
+    var event = new CustomEvent('cygnusPageLoaded', { "detail": { "page": location.pathname } });
     window.dispatchEvent(event);
   },
-  receivePageData: data => {
+  receivePageData: function receivePageData(data) {
     // Remove page from fetchingPages array
     var index = cygnus.fetchingPages.indexOf(data.link);
     if (index > -1) {
@@ -214,12 +220,12 @@ var cygnus = module.exports = {
   // usage the script will need to be self contained, so I moved them here.
   //
 
-  ajaxPromise: url => {
-    return new Promise((resolve, reject) => {
-      const req = new XMLHttpRequest();
+  ajaxPromise: function ajaxPromise(url) {
+    return new Promise(function (resolve, reject) {
+      var req = new XMLHttpRequest();
       req.open('GET', url);
 
-      req.onload = () => {
+      req.onload = function () {
         if (req.status === 200) {
           resolve(req.response);
         } else {
@@ -227,31 +233,31 @@ var cygnus = module.exports = {
         }
       };
 
-      req.onerror = () => {
+      req.onerror = function () {
         reject(new Error('Network Error'));
       };
 
       req.send();
     });
   },
-  parseHTML: string => {
-    const tmp = document.implementation.createHTMLDocument('temp');
+  parseHTML: function parseHTML(string) {
+    var tmp = document.implementation.createHTMLDocument('temp');
     tmp.documentElement.innerHTML = string;
     return tmp.documentElement;
   },
-  isFunction: (functionName, context) => {
-    let namespaces = functionName.split('.');
-    const func = namespaces.pop();
-    for (let k in namespaces) {
+  isFunction: function isFunction(functionName, context) {
+    var namespaces = functionName.split('.');
+    var func = namespaces.pop();
+    for (var k in namespaces) {
       context = context[namespaces[k]];
     }
     return typeof context[func] === 'function';
   },
-  getFunction: (functionName, context) => {
-    const args = [].slice.call(_arguments).splice(2);
-    const namespaces = functionName.split('.');
-    const func = namespaces.pop();
-    for (const k in namespaces) {
+  getFunction: function getFunction(functionName, context) {
+    var args = [].slice.call(_arguments).splice(2);
+    var namespaces = functionName.split('.');
+    var func = namespaces.pop();
+    for (var k in namespaces) {
       context = context[namespaces[k]];
     }
     if (context[func]) {
@@ -261,49 +267,5 @@ var cygnus = module.exports = {
     }
   },
 
-  workerBlob: URL.createObjectURL(new Blob([`const fetchedPages = [];
-    self.onmessage = msg => {
-      const data = JSON.parse(msg.data);
-
-      if (data.task === 'fetch') {
-        console.info("[Cygnus worker]: Fetching " + data.link);
-        if (fetchedPages.indexOf(data.link) < 0) {
-          getPage(data.link).then(response => {
-            fetchedPages.push(data.link);
-            sendToBrowser({ link: data.link, html: response });
-          }, error => {
-            console.error('[Cygnus worker]: Failed!', error);
-          });
-        }
-      }
-      if (data.task === 'add') {
-        console.info("[Cygnus worker]: Adding " + data.link + " to list without fetching.");
-        if (fetchedPages.indexOf(data.link) < 0) {
-          fetchedPages.push(data.link);
-        }
-      }
-    }
-    function getPage(url) {
-      return new Promise((resolve, reject) => {
-        const req = new XMLHttpRequest();
-        req.open('GET', url);
-
-        req.onload = () => {
-          if (req.status === 200) {
-            resolve(req.response);
-          } else {
-            reject(new Error(req.statusText));
-          }
-        };
-
-        req.onerror = () => {
-          reject(new Error('Network Error'));
-        };
-
-        req.send();
-      });
-    }
-    function sendToBrowser(data) {
-      self.postMessage(JSON.stringify(data));
-    }`], { type: 'application/javascript' }))
+  workerBlob: URL.createObjectURL(new Blob(['const fetchedPages = [];\n    self.onmessage = function (msg) {\n      const data = JSON.parse(msg.data);\n\n      if (data.task === \'fetch\') {\n        console.info("[Cygnus worker]: Fetching " + data.link);\n        if (fetchedPages.indexOf(data.link) < 0) {\n          getPage(data.link).then(function (response) {\n            fetchedPages.push(data.link);\n            sendToBrowser({ link: data.link, html: response });\n          }, function (error) {\n            console.error(\'[Cygnus worker]: Failed!\', error);\n          });\n        }\n      }\n      if (data.task === \'add\') {\n        console.info("[Cygnus worker]: Adding " + data.link + " to list without fetching.");\n        if (fetchedPages.indexOf(data.link) < 0) {\n          fetchedPages.push(data.link);\n        }\n      }\n    }\n    function getPage(url) {\n      return new Promise(function (resolve, reject) {\n        const req = new XMLHttpRequest();\n        req.open(\'GET\', url);\n\n        req.onload = function () {\n          if (req.status === 200) {\n            resolve(req.response);\n          } else {\n            reject(new Error(req.statusText));\n          }\n        };\n\n        req.onerror = function () {\n          reject(new Error(\'Network Error\'));\n        };\n\n        req.send();\n      });\n    }\n    function sendToBrowser(data) {\n      self.postMessage(JSON.stringify(data));\n    }'], { type: 'application/javascript' }))
 };

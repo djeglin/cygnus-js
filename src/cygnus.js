@@ -263,16 +263,16 @@ var cygnus = module.exports = {
 
   workerBlob: URL.createObjectURL( new Blob([ 
     `const fetchedPages = [];
-    self.onmessage = msg => {
+    self.onmessage = function (msg) {
       const data = JSON.parse(msg.data);
 
       if (data.task === 'fetch') {
         console.info("[Cygnus worker]: Fetching " + data.link);
         if (fetchedPages.indexOf(data.link) < 0) {
-          getPage(data.link).then(response => {
+          getPage(data.link).then(function (response) {
             fetchedPages.push(data.link);
             sendToBrowser({ link: data.link, html: response });
-          }, error => {
+          }, function (error) {
             console.error('[Cygnus worker]: Failed!', error);
           });
         }
@@ -285,11 +285,11 @@ var cygnus = module.exports = {
       }
     }
     function getPage(url) {
-      return new Promise((resolve, reject) => {
+      return new Promise(function (resolve, reject) {
         const req = new XMLHttpRequest();
         req.open('GET', url);
 
-        req.onload = () => {
+        req.onload = function () {
           if (req.status === 200) {
             resolve(req.response);
           } else {
@@ -297,7 +297,7 @@ var cygnus = module.exports = {
           }
         };
 
-        req.onerror = () => {
+        req.onerror = function () {
           reject(new Error('Network Error'));
         };
 
