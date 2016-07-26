@@ -20,6 +20,10 @@ var cygnus = module.exports = {
       window.onpopstate = cygnus.handlePopState;
       cygnus.options = Object.assign({}, defaults, opts);
       if (cygnus.options.makeGlobal) window.cygnus = cygnus;
+      window.addEventListener("scroll", cygnus.debounce(function(){
+        var st = window.pageYOffset || document.documentElement.scrollTop;
+        window.history.replaceState({ url: location.href, scrollTop: st }, '', location.href);
+      }, 100));
       cygnus.ready = true;
     }
 
@@ -95,6 +99,9 @@ var cygnus = module.exports = {
     });
   },
   handlePopState: event => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
     if (cygnus.ready) {
       cygnus.startLoadPage(document.location);
       return true;
@@ -170,10 +177,11 @@ var cygnus = module.exports = {
     wrapper.innerHTML = pageContent;
 
     // Update the history object
-    if (click) window.history.pushState({ url: href }, '', href);
+    if (click) window.history.pushState({ url: href, scrollTop: 0 }, '', href);
 
     // Scroll to the top of new page if from a clicked link
-    if (click) window.scrollTo(0, 0);
+    var scrollTop = history.state.scrollTop;
+    window.scrollTo(0, scrollTop);
 
     // Intro animation...
     intro = page.querySelector('body').getAttribute('data-intro');
@@ -259,6 +267,20 @@ var cygnus = module.exports = {
     } else {
       return false;
     }
+  },
+  debounce: function debounce(func, wait, immediate) {
+    var timeout;
+    return function() {
+      var context = this, args = arguments;
+      var later = function() {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      var callNow = immediate && !timeout;
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
   },
 
   workerBlob: URL.createObjectURL( new Blob([ 
