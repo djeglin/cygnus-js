@@ -145,6 +145,8 @@ window.addEventListener("cygnusPageLoaded", (e) => {
 ```
 
 ### Changelog
+`0.5.1`: Fixed a crash when going back in browser history if `scrollTop` wasn't set, by adding a default
+
 `0.5.0`: Added scroll position tracking and manual scroll position restoration for `popstate` events
 
 `0.4.0`: Cygnus will now scroll to the top of the page during transition if the page change is triggered from a clicked link (rather than history action)
