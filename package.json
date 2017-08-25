@@ -1,7 +1,7 @@
 {
   "name": "cygnus",
   "description": "Fast, graceful, JS-based page loading without going full SPA",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "djeglin",
   "bugs": {
     "url": "https://github.com/djeglin/cygnus-js/issues"
