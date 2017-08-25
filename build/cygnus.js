@@ -186,7 +186,7 @@ var cygnus = module.exports = {
     if (click) window.history.pushState({ url: href, scrollTop: 0 }, '', href);
 
     // Scroll to the top of new page if from a clicked link
-    var scrollTop = history.state.scrollTop;
+    var scrollTop = history.state.scrollTop || 0;
     window.scrollTo(0, scrollTop);
 
     // Intro animation...
