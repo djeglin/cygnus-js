@@ -112,7 +112,7 @@ var cygnus = module.exports = {
     }
   },
   startLoadPage: function startLoadPage(href) {
-    var click = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+    var click = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
     // Get the page from the store. We use "cygnus" rather than "this" here as
     // this method can be called from outside the local scope
@@ -186,7 +186,10 @@ var cygnus = module.exports = {
     if (click) window.history.pushState({ url: href, scrollTop: 0 }, '', href);
 
     // Scroll to the top of new page if from a clicked link
-    var scrollTop = history.state.scrollTop || 0;
+    var scrollTop = 0;
+    if (history.state.scrollTop) {
+      scrollTop = history.state.scrollTop;
+    }
     window.scrollTo(0, scrollTop);
 
     // Intro animation...
