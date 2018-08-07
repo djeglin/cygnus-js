@@ -17,6 +17,10 @@ var cygnus = module.exports = {
     }
 
     if (!cygnus.ready) {
+      if ('scrollRestoration' in history) {
+        // Back off, browser, I got this...
+        history.scrollRestoration = 'manual';
+      }
       window.onpopstate = cygnus.handlePopState;
       cygnus.options = Object.assign({}, defaults, opts);
       if (cygnus.options.makeGlobal) window.cygnus = cygnus;
@@ -181,7 +185,7 @@ var cygnus = module.exports = {
 
     // Scroll to the top of new page if from a clicked link
     var scrollTop = 0;
-    if (history.state.scrollTop) {
+    if (history.state && history.state.scrollTop) {
       scrollTop = history.state.scrollTop;
     }
     window.scrollTo(0, scrollTop);
